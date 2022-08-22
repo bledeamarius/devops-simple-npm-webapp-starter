@@ -32,7 +32,7 @@ pipeline {
         }
         stage ('Create artefact') {
             steps {
-                sh "tar czf simple-frontend-$BUILD_NUMBER.tar.gz node_modules package.json app dist"
+                sh 'tar czf simple-frontend-"$BUILD_NUMBER".tar.gz node_modules package.json app dist'
             }
         }
         stage('Archive locally') {
