@@ -20,7 +20,7 @@ pipeline {
     agent any
     parameters {
         string(name: 'IMAGE_NAME',     defaultValue: 'simple-npm-webapp', description: "Specify the image name")
-        string(name: 'CONTAINER_NAME', defaultValue: 'backend',           description: 'Specify the container name')
+        string(name: 'CONTAINER_NAME', defaultValue: 'frontend',           description: 'Specify the container name')
         string(name: 'PORT_TO_EXPOSE', defaultValue: '4002',              description: 'Specify the port')
     }
     environment {
@@ -53,7 +53,7 @@ pipeline {
                 sh "docker container stop $CONTAINER_NAME || true && docker container rm $CONTAINER_NAME || true"
                 
                 echo "Retrieve internal exposed port"
-                sh 'INTERNAL_PORT=$(grep -oP "\\d\\d\\d\\d\\" package.json)'
+                sh 'INTERNAL_PORT=$(grep -oP "\\\\d\\\\d\\\\d\\\\d" package.json)'
                 echo "$INTERNAL_PORT is exposed"
 
                 sh "docker run -d -p $PORT_TO_EXPOSE:$INTERNAL_PORT --name $CONTAINER_NAME $DOCKER_REGISTRY/$IMAGE_NAME:$BUILD_NUMBER"
