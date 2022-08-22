@@ -31,7 +31,7 @@ pipeline {
         }
 
         stage('Archive locally') {
-            stage {
+            steps {
                 sh "tar czf simple-frontend-$BUILD_NUMBER.tar.gz node_modules package.json app dist"
                 archiveArtifacts artifacts: "simple-frontend-$BUILD_NUMBER.tar.gz", followSymlinks: false, onlyIfSuccessful: true
             }
