@@ -1,4 +1,6 @@
 
+properties([copyArtifactPermission('*')])
+
 pipeline {
     agent any
      parameters {
