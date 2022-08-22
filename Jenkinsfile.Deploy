@@ -53,7 +53,7 @@ pipeline {
                 sh "docker container stop $CONTAINER_NAME || true && docker container rm $CONTAINER_NAME || true"
                 
                 echo "Retrieve internal exposed port"
-                INTERNAL_PORT=$(grep -oP "\\d\\d\\d\\d" package.json)
+                INTERNAL_PORT=$(grep -oP "\\\\d\\\\d\\\\d\\\s\d" package.json)
                 echo "$INTERNAL_PORT is exposed"
 
                 sh "docker run -d -p $PORT_TO_EXPOSE:$INTERNAL_PORT --name $CONTAINER_NAME $DOCKER_REGISTRY/$IMAGE_NAME:$BUILD_NUMBER"
