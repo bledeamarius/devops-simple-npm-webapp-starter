@@ -21,24 +21,23 @@ pipeline {
     parameters {
         string(name: 'IMAGE_NAME',     defaultValue: 'simple-npm-webapp', description: "Specify the image name")
         string(name: 'CONTAINER_NAME', defaultValue: 'backend',           description: 'Specify the container name')
-        string(name: 'PORT_TO_EXPOSE', defaultValue: '4000',              description: 'Specify the port')
+        string(name: 'PORT_TO_EXPOSE', defaultValue: '4002',              description: 'Specify the port')
     }
     environment {
         DOCKER_REGISTRY      = 'maryusmm'
-        PROJECT_TO_COPY_FROM = 'pip-backend-build-v2'
+        PROJECT_TO_COPY_FROM = 'pip-frontend-build-v2'
     }
 
     stages {
         
         stage('Copy artefact') {
             steps {
-                copyArtifacts excludes: '*.jar', filter: 'target/*.war', fingerprintArtifacts: true, projectName: "${PROJECT_TO_COPY_FROM}", selector: buildParameter('BUILD_SELECTOR'), target: './'
+                copyArtifacts filter: 'simple-frontend-*.tar.gz', fingerprintArtifacts: true, projectName: "${PROJECT_TO_COPY_FROM}", selector: buildParameter('BUILD_SELECTOR'), target: './'
             }
         }
-
-        stage('Debug step') {
+        stage('Extract content from archive') {
             steps {
-               sh 'ls target/'
+                sh 'tar -xf simple-frontend*.tar.gz'
             }
         }
         stage('Build docker image') { 
@@ -48,11 +47,16 @@ pipeline {
             }
         }
 
-                stage('Run docker image') { 
+        stage('Run docker image') { 
             steps {
                 echo "Kill docker container if it's already running"
                 sh "docker container stop $CONTAINER_NAME || true && docker container rm $CONTAINER_NAME || true"
-                sh "docker run -d -p $PORT_TO_EXPOSE:8080 --name $CONTAINER_NAME $DOCKER_REGISTRY/$IMAGE_NAME:$BUILD_NUMBER"
+                
+                echo "Retrieve internal exposed port"
+                sh "INTERNAL_PORT=$(grep -oP "\d\d\d\d" package.json)"
+                echo "$INTERNAL_PORT is exposed"
+
+                sh "docker run -d -p $PORT_TO_EXPOSE:$INTERNAL_PORT --name $CONTAINER_NAME $DOCKER_REGISTRY/$IMAGE_NAME:$BUILD_NUMBER"
             }
         }
 
