@@ -1,0 +1,46 @@
+
+pipeline {
+    agent any
+     parameters {
+        string(name: 'PORT_TO_EXPOSE', defaultValue: '4001',              description: 'Specify the port')
+    }
+    environment {
+        PROJECT_REPO_NAME = 'simple-npm-webapp-starter'
+    }
+
+    stages {
+        stage('Clone project repo') {
+            steps {
+                sh 'git clone https://github.com/bledeamarius/"${PROJECT_REPO_NAME}"'
+                sh 'mv "${PROJECT_REPO_NAME}"/* . '
+            }
+        }
+        stage('Replace port to expose') { 
+            steps {
+                echo "~~~ Replace port to expose with ${PORT_TO_EXPOSE}~~~"
+                sh   "sed -i "s/PORT_TO_EXPOSE/${PORT_TO_EXPOSE}/g" package.json"
+            }
+        }
+
+        stage('Npm install') {            
+            steps{
+                echo "~~~ Running npm install... ~~~"
+                sh 'npm install'
+                
+            }
+        }
+
+        stage('Archive locally') {
+            stage {
+                sh "tar czf simple-frontend-$BUILD_NUMBER.tar.gz node_modules package.json app dist"
+                archiveArtifacts artifacts: "simple-frontend-$BUILD_NUMBER.tar.gz", followSymlinks: false, onlyIfSuccessful: true
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs() // clean workspace
+        }
+ 
+    }
+}

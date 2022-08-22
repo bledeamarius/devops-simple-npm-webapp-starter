@@ -1,0 +1,79 @@
+properties([parameters([
+    [$class: 'BuildSelectorParameter',
+    defaultSelector: upstream(fallbackToLastSuccessful: true),
+    description: '',
+    name: 'BUILD_SELECTOR']])
+])
+// properties([
+//     parameters([
+//         string(defaultValue: '21', name: 'SPECIFIC_BUILD')]),
+//         //buildSelector(defaultSelector: lastSuccessful(), name: 'BUILD_SELECTOR')
+//         [
+//             $class: 'BuildSelectorParameter',
+//             defaultSelector: lastSuccessful(),
+//             description: 'Description',
+//             name: 'BUILD_SELECTOR']
+        
+// ])
+
+pipeline {
+    agent any
+    parameters {
+        string(name: 'IMAGE_NAME',     defaultValue: 'simple-npm-webapp', description: "Specify the image name")
+        string(name: 'CONTAINER_NAME', defaultValue: 'backend',           description: 'Specify the container name')
+        string(name: 'PORT_TO_EXPOSE', defaultValue: '4000',              description: 'Specify the port')
+    }
+    environment {
+        DOCKER_REGISTRY      = 'maryusmm'
+        PROJECT_TO_COPY_FROM = 'pip-backend-build-v2'
+    }
+
+    stages {
+        
+        stage('Copy artefact') {
+            steps {
+                copyArtifacts excludes: '*.jar', filter: 'target/*.war', fingerprintArtifacts: true, projectName: "${PROJECT_TO_COPY_FROM}", selector: buildParameter('BUILD_SELECTOR'), target: './'
+            }
+        }
+
+        stage('Debug step') {
+            steps {
+               sh 'ls target/'
+            }
+        }
+        stage('Build docker image') { 
+            steps {
+               
+                sh "docker build -t $DOCKER_REGISTRY/$IMAGE_NAME:$BUILD_NUMBER ."
+            }
+        }
+
+                stage('Run docker image') { 
+            steps {
+                echo "Kill docker container if it's already running"
+                sh "docker container stop $CONTAINER_NAME || true && docker container rm $CONTAINER_NAME || true"
+                sh "docker run -d -p $PORT_TO_EXPOSE:8080 --name $CONTAINER_NAME $DOCKER_REGISTRY/$IMAGE_NAME:$BUILD_NUMBER"
+            }
+        }
+
+        // stage('Login to DockerHub') {            
+        //     environment {
+        //         DOCKERHUB_CREDENTIALS = credentials('my-docker-hub-credentials')
+        //     }
+
+        //     steps{
+        //         sh "docker login -u=${DOCKERHUB_CREDENTIALS_USR} -p=${DOCKERHUB_CREDENTIALS_PSW}"
+        //     }
+        // }
+        // stage('Push to Docker Hub') {
+           
+        //     steps {
+                
+        //         // sh "echo 'push tot dockerhub' "
+        //         sh "docker push $DOCKER_REGISTRY/$IMAGE_NAME:$BUILD_NUMBER"
+        //     }
+        // }
+
+
+    }
+}
