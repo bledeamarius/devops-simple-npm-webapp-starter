@@ -38,7 +38,7 @@ pipeline {
         stage('Archive locally') {
             steps {
                 
-                archiveArtifacts artifacts: "simple-frontend-$BUILD_NUMBER.tar.gz", followSymlinks: false, onlyIfSuccessful: true
+                archiveArtifacts artifacts: 'simple-frontend-"$BUILD_NUMBER".tar.gz', followSymlinks: false, onlyIfSuccessful: true
             }
         }
     }
