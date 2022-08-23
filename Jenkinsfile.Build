@@ -2,7 +2,9 @@
 properties([copyArtifactPermission('*')])
 
 pipeline {
-    agent any
+    agent {
+        label 'Jenkins-agent-1'
+    }
      parameters {
         string(name: 'PORT_TO_EXPOSE', defaultValue: '4001',              description: 'Specify the port')
     }
