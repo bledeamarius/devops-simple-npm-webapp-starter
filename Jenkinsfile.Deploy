@@ -59,7 +59,7 @@ pipeline {
                 //echo "$INTERNAL_PORT is exposed"
 
                 sh 'INTERNAL_PORT=$(grep -oP "\\d\\d\\d\\d" package.json) \
-                docker run -d -p "$PORT_TO_EXPOSE":"$INTERNAL_PORT"--name "$CONTAINER_NAME" "$DOCKER_REGISTRY"/"$IMAGE_NAME":"$BUILD_NUMBER"'
+                docker run -d -p "$PORT_TO_EXPOSE":"$INTERNAL_PORT" --name "$CONTAINER_NAME" "$DOCKER_REGISTRY"/"$IMAGE_NAME":"$BUILD_NUMBER"'
             }
         }
 
