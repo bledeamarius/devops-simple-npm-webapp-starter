@@ -39,7 +39,7 @@ pipeline {
         }
         stage('Extract content from archive') {
             steps {
-                sh 'tar -xf simple-frontend*.tar.gz'
+                sh 'tar -xf simple-frontend-*.tar.gz'
             }
         }
         stage('Build docker image') { 
@@ -85,5 +85,11 @@ pipeline {
         // }
 
 
+    }
+    post {
+        always {
+            cleanWs() // clean workspace
+        }
+ 
     }
 }
