@@ -1,21 +1,11 @@
-properties([parameters([
-    [$class: 'BuildSelectorParameter',
-    defaultSelector: upstream(fallbackToLastSuccessful: true),
-    description: '',
-    name: 'BUILD_SELECTOR']])
-])
-// properties([
-//     parameters([
-//         string(defaultValue: '21', name: 'SPECIFIC_BUILD')]),
-//         //buildSelector(defaultSelector: lastSuccessful(), name: 'BUILD_SELECTOR')
-//         [
-//             $class: 'BuildSelectorParameter',
-//             defaultSelector: lastSuccessful(),
-//             description: 'Description',
-//             name: 'BUILD_SELECTOR']
-        
+// properties([parameters([
+//     [$class: 'BuildSelectorParameter',
+//     defaultSelector: upstream(fallbackToLastSuccessful: true),  // WORKING
+//     description: '',
+//     name: 'BUILD_SELECTOR']])
 // ])
 
+properties([parameters([buildSelector(defaultSelector: specific('$specific_var'), name: 'build_selector'), string(defaultValue: '22', name: 'specific_var')])])
 pipeline {
     agent {
         label 'Jenkins-agent-1'
