@@ -45,7 +45,10 @@ pipeline {
         stage('Build docker image') { 
             steps {
                
-                sh "docker build -t $DOCKER_REGISTRY/$IMAGE_NAME:$BUILD_NUMBER ."
+                sh '''
+                INTERNAL_PORT=$(grep -oP "\\d\\d\\d\\d" package.json) 
+                docker build -t "$DOCKER_REGISTRY"/"$IMAGE_NAME":"$BUILD_NUMBER" --build-arg PORT_TO_EXPOSE="$INTERNAL_PORT" ."
+                '''
             }
         }
 
@@ -61,7 +64,7 @@ pipeline {
                 sh '''
                 INTERNAL_PORT=$(grep -oP "\\d\\d\\d\\d" package.json) 
                 echo $INTERNAL_PORT 
-                docker run -d -p "$PORT_TO_EXPOSE":"$INTERNAL_PORT" --name "$CONTAINER_NAME" --build-arg PORT_TO_EXPOSE="$INTERNAL_PORT" "$DOCKER_REGISTRY"/"$IMAGE_NAME":"$BUILD_NUMBER"
+                docker run -d -p "$PORT_TO_EXPOSE":"$INTERNAL_PORT" --name "$CONTAINER_NAME" "$DOCKER_REGISTRY"/"$IMAGE_NAME":"$BUILD_NUMBER"
                 '''
             }
         }
