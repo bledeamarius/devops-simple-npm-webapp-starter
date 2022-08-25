@@ -1,5 +1,7 @@
 
-properties([copyArtifactPermission('*')])
+properties([
+    copyArtifactPermission('*')
+])
 
 pipeline {
     agent {
