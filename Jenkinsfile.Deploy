@@ -5,7 +5,14 @@
 //     name: 'BUILD_SELECTOR']])
 // ])
 
-properties([parameters([buildSelector(defaultSelector: specific('$specific_var'), name: 'build_selector'), string(defaultValue: '22', name: 'specific_var')])])
+properties([
+    parameters([
+        string(defaultValue: '22', name: 'SPECIFIC_BUILD'),
+        buildSelector(defaultSelector: specific('${SPECIFIC_BUILD}'), name: 'BUILD_SELECTOR')
+        ])
+
+])
+
 pipeline {
     agent {
         label 'Jenkins-agent-1'
