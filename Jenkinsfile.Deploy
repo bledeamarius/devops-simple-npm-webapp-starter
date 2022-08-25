@@ -1,17 +1,17 @@
-// properties([parameters([
-//     [$class: 'BuildSelectorParameter',
-//     defaultSelector: upstream(fallbackToLastSuccessful: true),  // WORKING
-//     description: '',
-//     name: 'BUILD_SELECTOR']])
-// ])
-
-properties([
-    parameters([
-        string(defaultValue: '42', name: 'SPECIFIC_BUILD'),
-        buildSelector(defaultSelector: specific('${SPECIFIC_BUILD}'), name: 'BUILD_SELECTOR')
-        ])
-
+properties([parameters([
+    [$class: 'BuildSelectorParameter',
+    defaultSelector: upstream(fallbackToLastSuccessful: true),  // WORKING
+    description: '',
+    name: 'BUILD_SELECTOR']])
 ])
+
+// properties([
+//     parameters([
+//         string(defaultValue: '2', name: 'SPECIFIC_BUILD'),
+//         buildSelector(defaultSelector: specific('${SPECIFIC_BUILD}'), name: 'BUILD_SELECTOR')
+//         ])
+
+// ])
 
 pipeline {
     agent {
@@ -31,7 +31,7 @@ pipeline {
         
         stage('Copy artefact') {
             steps {
-                copyArtifacts filter: 'simple-frontend-*.tar.gz', fingerprintArtifacts: true, projectName: "${PROJECT_TO_COPY_FROM}", selector: buildParameter("${SPECIFIC_BUILD}"), target: './'
+                copyArtifacts filter: 'simple-frontend-*.tar.gz', fingerprintArtifacts: true, projectName: "${PROJECT_TO_COPY_FROM}", selector: buildParameter("${BUILD_SELECTOR}"), target: './'
             }
         }
         stage('Extract content from archive') {
