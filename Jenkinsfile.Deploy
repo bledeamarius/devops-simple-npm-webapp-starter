@@ -47,7 +47,7 @@ pipeline {
                
                 sh '''
                 INTERNAL_PORT=$(grep -oP "\\d\\d\\d\\d" package.json) 
-                docker build -t "$DOCKER_REGISTRY"/"$IMAGE_NAME":"$BUILD_NUMBER" --build-arg PORT_TO_EXPOSE="$INTERNAL_PORT" ."
+                docker build -t "$DOCKER_REGISTRY"/"$IMAGE_NAME":"$BUILD_NUMBER" --build-arg PORT_TO_EXPOSE="$INTERNAL_PORT" .
                 '''
             }
         }
