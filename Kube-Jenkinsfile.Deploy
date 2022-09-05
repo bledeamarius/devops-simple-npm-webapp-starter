@@ -1,0 +1,109 @@
+properties([parameters([
+    [$class: 'BuildSelectorParameter',
+    defaultSelector: upstream(fallbackToLastSuccessful: true),  // WORKING
+    description: '',
+    name: 'BUILD_SELECTOR']])
+])
+
+// properties([
+//     parameters([
+//         string(defaultValue: '2', name: 'SPECIFIC_BUILD'),
+//         buildSelector(defaultSelector: specific('${SPECIFIC_BUILD}'), name: 'BUILD_SELECTOR')
+//         ])
+
+// ])
+
+pipeline {
+    agent {
+        label 'Jenkins-agent-1'
+    }
+    parameters {
+        string(name: 'IMAGE_NAME',     defaultValue: 'simple-npm-webapp', description: "Specify the image name")
+        string(name: 'CONTAINER_NAME', defaultValue: 'frontend',           description: 'Specify the container name')
+        string(name: 'PORT_TO_EXPOSE', defaultValue: '4002',              description: 'Specify the port')
+    }
+    environment {
+        DOCKER_REGISTRY      = 'maryusmm'
+        PROJECT_TO_COPY_FROM = 'pip-frontend-build-v2'
+    }
+
+    stages {
+        
+        stage('Copy artefact') {
+            steps {
+                copyArtifacts filter: 'simple-frontend-*.tar.gz', fingerprintArtifacts: true, projectName: "${PROJECT_TO_COPY_FROM}", selector: buildParameter("${BUILD_SELECTOR}"), target: './'
+            }
+        }
+        stage('Extract content from archive') {
+            steps {
+                sh 'tar -xf simple-frontend-*.tar.gz'
+            }
+        }
+        stage('Build docker image') { 
+            steps {
+               
+                sh '''
+                INTERNAL_PORT=$(grep -oP "\\d\\d\\d\\d" package.json) 
+                docker build -t "$DOCKER_REGISTRY"/"$IMAGE_NAME":"$BUILD_NUMBER" --build-arg PORT_TO_EXPOSE="$INTERNAL_PORT" .
+                '''
+            }
+        }
+
+        // stage('Run docker image') { 
+        //     steps {
+        //         echo "Kill docker container if it's already running"
+        //         sh "docker container stop $CONTAINER_NAME || true && docker container rm $CONTAINER_NAME || true"
+                
+        //         echo "Retrieve internal exposed port"
+
+        //         sh '''
+        //         INTERNAL_PORT=$(grep -oP "\\d\\d\\d\\d" package.json) 
+        //         echo $INTERNAL_PORT 
+        //         docker run -d -p "$PORT_TO_EXPOSE":"$INTERNAL_PORT" --name "$CONTAINER_NAME" "$DOCKER_REGISTRY"/"$IMAGE_NAME":"$BUILD_NUMBER"
+        //         '''
+        //     }
+        // }
+
+        stage('Login to DockerHub') {            
+            environment {
+                DOCKERHUB_CREDENTIALS = credentials('my-docker-hub-credentials')
+            }
+
+            steps{
+                sh "docker login -u=${DOCKERHUB_CREDENTIALS_USR} -p=${DOCKERHUB_CREDENTIALS_PSW}"
+            }
+        }
+        stage('Push to Docker Hub') {
+           
+            steps {
+                
+                // sh "echo 'push tot dockerhub' "
+                sh "docker push $DOCKER_REGISTRY/$IMAGE_NAME:$BUILD_NUMBER"
+            }
+        }
+
+        stage('Prepare Kube Objects') {
+            steps {
+                echo '~~~ Replacing docker image tag ~~~'
+                sh 'sed -i "s/DOCKER_IMAGE_TAG/"${BUILD_NUMBER}"/g" Deplyoment.yml'
+
+                echo '~~~ Replacing port to expose ~~~'
+                sh 'sed -i "s/PORT_TO_EXPOSE/"${PORT_TO_EXPOSE}"/g" Service.yml'
+            }
+        }
+        stage('Deploy container') {
+            steps {
+                sh '''
+                    kubectl create -f Deployment.yml
+                '''
+            }
+        }
+
+    }
+    post {
+        always {
+            cleanWs() // clean workspace
+        }
+ 
+    }
+}

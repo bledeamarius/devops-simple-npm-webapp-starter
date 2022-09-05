@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind:  Deployment
+metadata:
+  name: frontend-simple-npm
+  labels:
+    tier: deployment-frontend
+    type: deployment-npm
+spec:
+  template:
+    metadata:
+      name: pod-frontend-npm
+      labels:
+        tier: pod-frontend
+        type: pod-npm
+    spec:
+      containers:
+        - name: simple-npm-webapp
+          image: maryusmm/simple-npm-webapp:DOCKER_IMAGE_TAG
+  replicas: 3
+  selector:
+    matchLabels:
+          tier: pod-frontend
+          type: pod-npm
