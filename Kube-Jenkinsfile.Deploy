@@ -85,7 +85,7 @@ pipeline {
         stage('Prepare Kube Objects') {
             steps {
                 echo '~~~ Replacing docker image tag ~~~'
-                sh 'sed -i "s/DOCKER_IMAGE_TAG/"${BUILD_NUMBER}"/g" Deplyoment.yml'
+                sh 'sed -i "s/DOCKER_IMAGE_TAG/"${BUILD_NUMBER}"/g" Deployment.yml'
 
                 echo '~~~ Replacing port to expose ~~~'
                 sh 'sed -i "s/PORT_TO_EXPOSE/"${PORT_TO_EXPOSE}"/g" Service.yml'
