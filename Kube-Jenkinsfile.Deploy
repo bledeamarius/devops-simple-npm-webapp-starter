@@ -94,6 +94,7 @@ pipeline {
         stage('Deploy container') {
             steps {
                 sh '''
+                whoami
                     kubectl create -f Deployment.yml
                 '''
             }
