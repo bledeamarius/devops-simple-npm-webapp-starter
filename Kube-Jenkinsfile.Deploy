@@ -18,9 +18,9 @@ pipeline {
         label 'Jenkins-agent-1'
     }
     parameters {
-        string(name: 'IMAGE_NAME',     defaultValue: 'simple-npm-webapp', description: "Specify the image name")
+        string(name: 'IMAGE_NAME',     defaultValue: 'simple-npm-webapp',  description: "Specify the image name")
         string(name: 'CONTAINER_NAME', defaultValue: 'frontend',           description: 'Specify the container name')
-        string(name: 'PORT_TO_EXPOSE', defaultValue: '4002',              description: 'Specify the port')
+        string(name: 'PORT_TO_EXPOSE', defaultValue: '4002',               description: 'Specify the port')
     }
     environment {
         DOCKER_REGISTRY      = 'maryusmm'
@@ -95,6 +95,14 @@ pipeline {
             steps {
                 sh '''
                     kubectl create -f Deployment.yml
+                '''
+            }
+        }
+
+          stage('Expose container') {
+            steps {
+                sh '''
+                    kubectl port-forward deployment/frontend-simple-npm ${PORT_TO_EXPOSE}:4000
                 '''
             }
         }
