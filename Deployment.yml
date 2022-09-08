@@ -16,7 +16,7 @@ spec:
       containers:
         - name: simple-npm-webapp
           image: maryusmm/simple-npm-webapp:DOCKER_IMAGE_TAG
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
           tier: pod-frontend
