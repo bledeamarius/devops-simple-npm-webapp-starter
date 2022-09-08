@@ -103,11 +103,7 @@ pipeline {
           stage('Expose container') {
             steps {
                 sh '''
-                    while [[ kubectl get pods -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}' != TRUE ]];
-                    do
-                        echo "Pods not ready yet..."
-                        sleep 1
-                    done
+                    while [[ $(kubectl get pods -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for pod" && sleep 1; done
                     kubectl port-forward deployment/frontend-simple-npm ${PORT_TO_EXPOSE}:4000
                 '''
             }
