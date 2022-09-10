@@ -20,7 +20,7 @@ pipeline {
     parameters {
         string(name: 'IMAGE_NAME',     defaultValue: 'simple-npm-webapp',  description: "Specify the image name")
         string(name: 'CONTAINER_NAME', defaultValue: 'frontend',           description: 'Specify the container name')
-        string(name: 'PORT_TO_EXPOSE', defaultValue: '4002',               description: 'Specify the port')
+        string(name: 'PORT_TO_EXPOSE', defaultValue: '6002',               description: 'Specify the port')
     }
     environment {
         DOCKER_REGISTRY      = 'maryusmm'
