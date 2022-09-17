@@ -104,7 +104,8 @@ pipeline {
             steps {
                 sh '''
                     sleep 5
-                    kubectl port-forward deployment/frontend-simple-npm ${PORT_TO_EXPOSE}:4001
+                    #kubectl port-forward deployment/frontend-simple-npm ${PORT_TO_EXPOSE}:4001
+                    kubectl create -f Service.yml
                 '''
             }
         }

@@ -8,16 +8,14 @@ metadata:
 spec:
   template:
     metadata:
-      name: pod-frontend-npm
+      name: pod-frontend
       labels:
         tier: pod-frontend
-        type: pod-npm
     spec:
       containers:
         - name: simple-npm-webapp
-          image: maryusmm/simple-npm-webapp:DOCKER_IMAGE_TAG
+          image: maryusmm/simple-npm-webapp:8
   replicas: 1
   selector:
     matchLabels:
           tier: pod-frontend
-          type: pod-npm

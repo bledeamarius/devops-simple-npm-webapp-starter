@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: svc-frontend
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     tier: pod-frontend
-    type: pod-npm
   ports:
-  - port: 30008
+  - port: 4000
     targetPort: 4000
+    nodePort: 30008
