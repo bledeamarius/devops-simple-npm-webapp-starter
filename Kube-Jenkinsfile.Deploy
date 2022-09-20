@@ -20,7 +20,7 @@ pipeline {
     parameters {
         string(name: 'IMAGE_NAME',     defaultValue: 'simple-npm-webapp',  description: "Specify the image name")
         string(name: 'CONTAINER_NAME', defaultValue: 'frontend',           description: 'Specify the container name')
-        string(name: 'PORT_TO_EXPOSE', defaultValue: '6002',               description: 'Specify the port')
+        string(name: 'PORT_TO_EXPOSE', defaultValue: '30008',               description: 'Specify the port')
     }
     environment {
         DOCKER_REGISTRY      = 'maryusmm'
@@ -48,21 +48,6 @@ pipeline {
                 '''
             }
         }
-
-        // stage('Run docker image') { 
-        //     steps {
-        //         echo "Kill docker container if it's already running"
-        //         sh "docker container stop $CONTAINER_NAME || true && docker container rm $CONTAINER_NAME || true"
-                
-        //         echo "Retrieve internal exposed port"
-
-        //         sh '''
-        //         INTERNAL_PORT=$(grep -oP "\\d\\d\\d\\d" package.json) 
-        //         echo $INTERNAL_PORT 
-        //         docker run -d -p "$PORT_TO_EXPOSE":"$INTERNAL_PORT" --name "$CONTAINER_NAME" "$DOCKER_REGISTRY"/"$IMAGE_NAME":"$BUILD_NUMBER"
-        //         '''
-        //     }
-        // }
 
         stage('Login to DockerHub') {            
             environment {
@@ -94,8 +79,9 @@ pipeline {
         stage('Deploy container') {
             steps {
                 sh '''
-                    kubectl delete -f Deployment.yml || true
-                    kubectl create -f Deployment.yml
+                    // kubectl delete -f Deployment.yml || true
+                    // kubectl create -f Deployment.yml
+                    kubectl apply -f Deployment.yml
                 '''
             }
         }
@@ -103,7 +89,6 @@ pipeline {
           stage('Expose container') {
             steps {
                 sh '''
-                    sleep 5
                     #kubectl port-forward deployment/frontend-simple-npm ${PORT_TO_EXPOSE}:4001
                     kubectl create -f Service.yml
                 '''

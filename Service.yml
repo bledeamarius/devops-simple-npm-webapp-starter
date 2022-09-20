@@ -9,4 +9,4 @@ spec:
   ports:
     - port: 4001
       targetPort: 4001
-      nodePort: 30008
+      nodePort: PORT_TO_EXPOSE
