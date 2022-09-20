@@ -81,7 +81,6 @@ pipeline {
                 sh '''
                      kubectl delete -f Deployment.yml || true
                      kubectl create -f Deployment.yml
-                    //kubectl apply -f Deployment.yml
                 '''
             }
         }
