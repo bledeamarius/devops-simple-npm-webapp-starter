@@ -14,9 +14,9 @@ properties([parameters([
 // ])
 
 pipeline {
-    // agent {
-    //     label 'Jenkins-agent-1'
-    // }
+    agent any
+        //label 'Jenkins-agent-1'
+        
     parameters {
         string(name: 'IMAGE_NAME',     defaultValue: 'simple-npm-webapp',  description: "Specify the image name")
         string(name: 'CONTAINER_NAME', defaultValue: 'frontend',           description: 'Specify the container name')
